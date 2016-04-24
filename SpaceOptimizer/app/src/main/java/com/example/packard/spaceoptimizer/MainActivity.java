@@ -1,5 +1,6 @@
 package com.example.packard.spaceoptimizer;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import android.app.AlertDialog;
@@ -31,8 +32,9 @@ public class MainActivity extends ListActivity {
         setContentView(R.layout.activity_main);
 
         packageManager = getPackageManager();
-
+       // new files().getfilelist();
         new LoadApplications().execute();
+
     }
 
 
