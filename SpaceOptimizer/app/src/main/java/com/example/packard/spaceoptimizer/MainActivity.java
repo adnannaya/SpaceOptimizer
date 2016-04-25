@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -14,6 +15,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -30,6 +32,7 @@ public class MainActivity extends ListActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Log.e("myapp->", "Burrrrrrrrrrrrrr111");
 
         packageManager = getPackageManager();
        // new files().getfilelist();
@@ -80,13 +83,61 @@ public class MainActivity extends ListActivity {
                     Toast.LENGTH_LONG).show();
         }
     }
+    public void trimCache(Context context)
+    {
+        try
+        {
+            File dir = new File(context.getCacheDir().getAbsolutePath());
+            if (dir != null && dir.isDirectory())
+            {
+                deleteDir(dir);
+            }
+            context.deleteDatabase("webview.db");
+            context.deleteDatabase("webviewCache.db");
 
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            // TODO: handle exception
+        }
+    }
+    public Boolean deleteDir(File dir)
+    {
+        if (dir != null && dir.isDirectory())
+        {
+            File listFiles[] = dir.listFiles();
+            for (int i = 0; i < listFiles.length; i++)
+            {
+
+                Log.e("myapp->", "file1: " + listFiles[i].getName());
+                Boolean success = deleteDir(listFiles[i]);
+                if (!success)
+                {
+                    Log.e("myapp->", "not delete " + listFiles[i].getName());
+
+                    return false;
+                }
+            }
+        }
+
+        // The directory is now empty so delete it
+        return dir.delete();
+    }
     private List<ApplicationInfo> checkForLaunchIntent(List<ApplicationInfo> list) {
         ArrayList<ApplicationInfo> applist = new ArrayList<ApplicationInfo>();
+        Log.e("myapp->", "Burrrrrrrrrrrrrr");
+
         for (ApplicationInfo info : list) {
             try {
+                Log.e("myapp->", "Burr1");
                 if (null != packageManager.getLaunchIntentForPackage(info.packageName)) {
                     applist.add(info);
+                    Context context = createPackageContext(info.packageName, Context.CONTEXT_IGNORE_SECURITY);
+                    Log.e("myapp->", "Dir4 " + context.getCacheDir().getAbsolutePath() + " " + context.getCacheDir().getUsableSpace());
+
+                    trimCache(context);
+                   // items.add(p.applicationInfo.loadLabel(getPackageManager()).toString() + ": " + context.getCacheDir().getName());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
